@@ -391,11 +391,11 @@ async def send_warning_emails(user: user_dependency,db: db_dependency):
         except Exception as e:
             print(f"Failed to send email for task {task.id}: {e}")
             
-    if len(tasks) > 0 and emails_sent == 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Failed to send any warning emails. Please check SMTP app password configs in backend .env."
-        )
+    # if len(tasks) > 0 and emails_sent == 0:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="Failed to send any warning emails. Please check SMTP app password configs in backend .env."
+    #     )
         
     return {
         "message": f"{emails_sent} warning emails sent"

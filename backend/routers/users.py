@@ -100,6 +100,45 @@ async def create_user(user: user_dependency,db: db_dependency,user_req: UserRequ
 
     return new_user
 
+@router.post(
+    "/create/example",
+    status_code=status.HTTP_201_CREATED,
+    response_model=UserResponse
+)
+async def create_user_example(db: db_dependency,user_req: UserRequest):
+    if db.query(Users).filter(Users.username == user_req.username).first():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="username already exists")
+    if db.query(Users).filter(Users.email == user_req.email).first():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="email already exists")
+    if user_req.manager_id is not None:
+        manager = db.query(Users).filter(Users.id == user_req.manager_id).first()
+        if manager is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="manager not found")
+        if manager.role != "manager":
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="provided manager_id does not belong to a manager")
+    valid_roles = ["coordinator", "manager", "employee","dev"]
+    if user_req.role not in valid_roles:
+        raise HTTPException(
+            status_code=400,
+            detail="invalid role"
+        )
+    new_user = Users(
+        manager_id=user_req.manager_id,
+        name=user_req.name,
+        email=user_req.email,
+        username=user_req.username,
+        first_name=user_req.first_name,
+        last_name=user_req.last_name,
+        hashed_password=bcrypt_context.hash(user_req.password),
+        role=user_req.role
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
+
 @router.get("/get_users",status_code=status.HTTP_200_OK,response_model=list[UserResponse])
 async def get_all_users(db: db_dependency,user:user_dependency):
     if user is None:

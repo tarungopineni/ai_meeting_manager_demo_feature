@@ -153,7 +153,7 @@ content = """{
     "completed": false,
     "manager_id": 10,
     "assignee_id": 11,
-    "deadline": "2026-07-03T23:59:59",
+    "deadline": "2026-07-08T23:59:59",
     "deadline_text": "by Friday"
   },
   {
@@ -163,7 +163,7 @@ content = """{
     "completed": false,
     "manager_id": 10,
     "assignee_id": 11,
-    "deadline": "2026-07-03T18:00:00",
+    "deadline": "2026-07-08T18:00:00",
     "deadline_text": "Friday evening"
   },
   {
@@ -173,7 +173,7 @@ content = """{
     "completed": false,
     "manager_id": 10,
     "assignee_id": 12,
-    "deadline": "2026-07-06T23:59:59",
+    "deadline": "2026-07-08T23:59:59",
     "deadline_text": "by Monday"
   },
   {
@@ -183,7 +183,7 @@ content = """{
     "completed": false,
     "manager_id": 10,
     "assignee_id": 10,
-    "deadline": "2026-07-01T15:00:00",
+    "deadline": "2026-07-08T15:00:00",
     "deadline_text": "by tomorrow afternoon"
   },
   {
