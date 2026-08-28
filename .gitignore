@@ -10,3 +10,4 @@ Google_Apis/credentials2.json
 
 ffmpeg/
 dist/
+node_modules/
