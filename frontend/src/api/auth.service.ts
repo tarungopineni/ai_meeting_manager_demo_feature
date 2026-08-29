@@ -1,7 +1,5 @@
-import axios from 'axios'
+import api from './axios'
 import type { LoginResponse } from '@/types'
-
-const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 // Auth uses OAuth2 form, not JSON
 export const authService = {
@@ -10,8 +8,8 @@ export const authService = {
     params.append('username', username)
     params.append('password', password)
 
-    const res = await axios.post<LoginResponse>(
-      `${VITE_BACKEND_URL}/auth/token`,
+    const res = await api.post<LoginResponse>(
+      '/auth/token',
       params,
       {
         headers: {

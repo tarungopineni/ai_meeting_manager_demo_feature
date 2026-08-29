@@ -71,7 +71,7 @@ async def create_user(user: user_dependency,db: db_dependency,user_req: UserRequ
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="username already exists")
     if db.query(Users).filter(Users.email == user_req.email).first():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="email already exists")
-    if user_req.manager_id is not None:
+    if user_req.manager_id is not None and user_req.manager_id != 0:
         manager = db.query(Users).filter(Users.id == user_req.manager_id).first()
         if manager is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="manager not found")
@@ -84,7 +84,7 @@ async def create_user(user: user_dependency,db: db_dependency,user_req: UserRequ
             detail="invalid role"
         )
     new_user = Users(
-        manager_id=user_req.manager_id,
+        manager_id=user_req.manager_id if (user_req.manager_id and user_req.manager_id != 0) else None,
         name=user_req.name,
         email=user_req.email,
         username=user_req.username,
@@ -110,7 +110,7 @@ async def create_user_example(db: db_dependency,user_req: UserRequest):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="username already exists")
     if db.query(Users).filter(Users.email == user_req.email).first():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="email already exists")
-    if user_req.manager_id is not None:
+    if user_req.manager_id is not None and user_req.manager_id != 0:
         manager = db.query(Users).filter(Users.id == user_req.manager_id).first()
         if manager is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="manager not found")
@@ -123,7 +123,7 @@ async def create_user_example(db: db_dependency,user_req: UserRequest):
             detail="invalid role"
         )
     new_user = Users(
-        manager_id=user_req.manager_id,
+        manager_id=user_req.manager_id if (user_req.manager_id and user_req.manager_id != 0) else None,
         name=user_req.name,
         email=user_req.email,
         username=user_req.username,

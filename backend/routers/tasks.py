@@ -253,27 +253,28 @@ async def mark_task_completed(user:user_dependency,task_id:int,db:db_dependency)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="task is already marked as completed")
     model.completed = True
     model.verified_by_manager = False
-    manager_model = db.query(Users).filter(Users.id == model.manager_id).first()
+    manager_model = db.query(Users).filter(Users.id == model.manager_id).first() if model.manager_id else None
     db.commit()
-    email_text = generate_task_completion_email(
-        employee_id=user["id"],
-        employee_name=user["username"],
-        employee_role=user["role"],
-        task_id=model.id,
-        task_title=model.title,
-        task_description=model.description,
-        completed_at=datetime.now().isoformat()
-    )
-    try:
-        send_email(
-            sender_email="tarungopineni@gmail.com",
-            app_password=os.getenv("EMAIL_APP_PASS"),
-            receiver_email=manager_model.email,
-            subject=email_text[0],
-            body=email_text[1]
+    if manager_model and manager_model.email:
+        email_text = generate_task_completion_email(
+            employee_id=user["id"],
+            employee_name=user["username"],
+            employee_role=user["role"],
+            task_id=model.id,
+            task_title=model.title,
+            task_description=model.description,
+            completed_at=datetime.now().isoformat()
         )
-    except Exception as e:
-        print("Error sending email:", e)
+        try:
+            send_email(
+                sender_email="tarungopineni@gmail.com",
+                app_password=os.getenv("EMAIL_APP_PASS"),
+                receiver_email=manager_model.email,
+                subject=email_text[0],
+                body=email_text[1]
+            )
+        except Exception as e:
+            print("Error sending email:", e)
 
 @router.get("/task-warnings", status_code=status.HTTP_200_OK)
 async def get_task_warnings(user: user_dependency,db: db_dependency):
