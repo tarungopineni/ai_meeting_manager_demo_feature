@@ -93,13 +93,14 @@ export default function VerificationQueuePage() {
       label: 'Actions',
       width: '220px',
       render: (t: Task) => (
-        <div className="flex gap-2">
+        <div className="flex items-center gap-1.5">
           <Button
             size="sm"
             variant="primary"
             icon={<ShieldCheck size={12} />}
             loading={verifyMutation.isPending && verifyMutation.variables === t.id}
             onClick={() => verifyMutation.mutate(t.id)}
+            className="px-2.5 py-1 text-xs whitespace-nowrap"
           >
             Verify
           </Button>
@@ -109,6 +110,7 @@ export default function VerificationQueuePage() {
             icon={<XCircle size={12} />}
             loading={rejectMutation.isPending && rejectMutation.variables === t.id}
             onClick={() => rejectMutation.mutate(t.id)}
+            className="px-2.5 py-1 text-xs whitespace-nowrap"
           >
             Reject
           </Button>

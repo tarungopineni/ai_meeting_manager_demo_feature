@@ -77,15 +77,15 @@ export default function CoordinatorTasksPage() {
 
   return (
     <AppShell title="Tasks" subtitle="All organisation tasks">
-      <div className="flex items-center gap-2 mb-4">
-        <Filter size={14} className="text-text-muted" />
-        <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="input-base text-xs w-32">
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <Filter size={14} className="text-text-muted flex-shrink-0" />
+        <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="input-base text-xs flex-1 sm:flex-initial sm:w-32">
           <option value="">All Priorities</option>
           <option value="HIGH">High</option>
           <option value="MEDIUM">Medium</option>
           <option value="LOW">Low</option>
         </select>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="input-base text-xs w-32">
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="input-base text-xs flex-1 sm:flex-initial sm:w-32">
           <option value="">All Status</option>
           <option value="in_progress">In Progress</option>
           <option value="pending_review">Pending Review</option>

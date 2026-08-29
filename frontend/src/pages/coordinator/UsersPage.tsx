@@ -202,7 +202,7 @@ function CreateModal({ onClose, managers }: { onClose: () => void; managers: Use
   return (
     <Modal open onClose={onClose} title="Create New User" size="lg">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <Input label="Full Name"  {...register('name')}       error={errors.name?.message} />
           <Input label="Email"      {...register('email')}      error={errors.email?.message} type="email" />
           <Input label="First Name" {...register('first_name')} error={errors.first_name?.message} />
@@ -210,7 +210,7 @@ function CreateModal({ onClose, managers }: { onClose: () => void; managers: Use
           <Input label="Username"   {...register('username')}   error={errors.username?.message} />
           <Input label="Password"   {...register('password')}   error={errors.password?.message} type="password" />
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <Select label="Role" {...register('role')} options={ROLES} error={errors.role?.message} />
           <Select
             label="Manager (optional)"
@@ -219,9 +219,9 @@ function CreateModal({ onClose, managers }: { onClose: () => void; managers: Use
             placeholder="None"
           />
         </div>
-        <div className="flex gap-3 pt-2">
-          <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>Cancel</Button>
-          <Button type="submit" loading={isSubmitting} className="flex-1">Create User</Button>
+        <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 pt-2">
+          <Button type="button" variant="secondary" className="w-full sm:flex-1" onClick={onClose}>Cancel</Button>
+          <Button type="submit" loading={isSubmitting} className="w-full sm:flex-1">Create User</Button>
         </div>
       </form>
     </Modal>
@@ -246,13 +246,13 @@ function DeleteModal({ user, onClose }: { user: User; onClose: () => void }) {
 
   return (
     <Modal open onClose={onClose} title="Delete User" size="sm">
-      <p className="text-sm text-text-secondary mb-1">
+      <p className="text-xs sm:text-sm text-text-secondary mb-1">
         Are you sure you want to delete <span className="font-semibold text-text-primary">{user.name}</span>?
       </p>
       <p className="text-xs text-text-muted mb-5">This action cannot be undone.</p>
-      <div className="flex gap-3">
-        <Button variant="secondary" className="flex-1" onClick={onClose}>Cancel</Button>
-        <Button variant="danger" className="flex-1" loading={mutation.isPending} onClick={() => mutation.mutate()}>
+      <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
+        <Button variant="secondary" className="w-full sm:flex-1" onClick={onClose}>Cancel</Button>
+        <Button variant="danger" className="w-full sm:flex-1" loading={mutation.isPending} onClick={() => mutation.mutate()}>
           Delete User
         </Button>
       </div>
@@ -282,12 +282,12 @@ export default function UsersPage() {
     { key: 'id',       label: '#',        width: '60px', render: (u: User) => <span className="text-text-muted font-mono text-xs">#{u.id}</span>, sortable: true },
     { key: 'name',     label: 'Name',     sortable: true, render: (u: User) => (
       <div className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-full bg-accent/15 flex items-center justify-center text-accent text-xs font-semibold uppercase">
+        <div className="w-7 h-7 rounded-full bg-accent/15 flex items-center justify-center text-accent text-xs font-semibold uppercase flex-shrink-0">
           {u.name?.[0]}
         </div>
-        <div>
-          <p className="text-sm font-medium text-text-primary">{u.name}</p>
-          <p className="text-xs text-text-muted">{u.email}</p>
+        <div className="min-w-0">
+          <p className="text-xs sm:text-sm font-medium text-text-primary truncate">{u.name}</p>
+          <p className="text-[11px] text-text-muted truncate">{u.email}</p>
         </div>
       </div>
     )},
@@ -295,33 +295,33 @@ export default function UsersPage() {
     { key: 'role',     label: 'Role',     render: (u: User) => <RoleBadge role={u.role} /> },
     { key: 'manager_id', label: 'Manager', render: (u: User) => {
       const mgr = managers.find((m) => m.id === u.manager_id)
-      return mgr ? <span className="text-sm text-text-secondary">{mgr.name}</span> : <span className="text-text-muted">—</span>
+      return mgr ? <span className="text-xs sm:text-sm text-text-secondary">{mgr.name}</span> : <span className="text-text-muted">—</span>
     }},
     { key: 'actions',  label: '', width: '120px', render: (u: User) => (
       <div className="flex items-center gap-1">
-        <button onClick={() => open(u, 'view')}        className="p-1.5 rounded hover:bg-surface-overlay text-text-muted hover:text-text-primary transition-colors" title="View"><Eye size={14} /></button>
-        <button onClick={() => open(u, 'edit')}        className="p-1.5 rounded hover:bg-surface-overlay text-text-muted hover:text-info transition-colors" title="Edit"><Edit2 size={14} /></button>
-        <button onClick={() => open(u, 'credentials')} className="p-1.5 rounded hover:bg-surface-overlay text-text-muted hover:text-warning transition-colors" title="Credentials"><KeyRound size={14} /></button>
-        <button onClick={() => { setSelected(u); setShowDelete(true) }} className="p-1.5 rounded hover:bg-danger/10 text-text-muted hover:text-danger transition-colors" title="Delete"><Trash2 size={14} /></button>
+        <button onClick={() => open(u, 'view')}        className="p-1.5 rounded hover:bg-surface-overlay text-text-muted hover:text-text-primary transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center cursor-pointer" title="View"><Eye size={14} /></button>
+        <button onClick={() => open(u, 'edit')}        className="p-1.5 rounded hover:bg-surface-overlay text-text-muted hover:text-info transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center cursor-pointer" title="Edit"><Edit2 size={14} /></button>
+        <button onClick={() => open(u, 'credentials')} className="p-1.5 rounded hover:bg-surface-overlay text-text-muted hover:text-warning transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center cursor-pointer" title="Credentials"><KeyRound size={14} /></button>
+        <button onClick={() => { setSelected(u); setShowDelete(true) }} className="p-1.5 rounded hover:bg-danger/10 text-text-muted hover:text-danger transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center cursor-pointer" title="Delete"><Trash2 size={14} /></button>
       </div>
     )},
   ]
 
   return (
     <AppShell title="Users" subtitle="Manage organisation members">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2">
-          <Filter size={14} className="text-text-muted" />
+          <Filter size={14} className="text-text-muted flex-shrink-0" />
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="input-base text-xs w-36"
+            className="input-base text-xs w-full sm:w-36"
           >
             <option value="">All Roles</option>
             {ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
           </select>
         </div>
-        <Button icon={<UserPlus size={15} />} onClick={() => setShowCreate(true)}>New User</Button>
+        <Button icon={<UserPlus size={15} />} onClick={() => setShowCreate(true)} className="w-full sm:w-auto justify-center">New User</Button>
       </div>
 
       <DataTable

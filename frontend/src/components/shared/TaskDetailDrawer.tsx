@@ -86,12 +86,12 @@ export function TaskDetailDrawer({ task, onClose }: TaskDetailDrawerProps) {
             { label: 'Created At', value: formatDateTime(task.created_at), icon: <Calendar size={14} className="text-text-muted" /> },
             { label: 'Last Updated', value: formatDateTime(task.updated_at), icon: <Calendar size={14} className="text-text-muted" /> },
           ].map(({ label, value, icon, warn }) => (
-            <div key={label} className="bg-surface-raised border border-surface-border/50 rounded-lg px-4 py-3 flex items-center justify-between">
+            <div key={label} className="bg-surface-raised border border-surface-border/50 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
               <div className="flex items-center gap-2">
                 {icon}
                 <span className="text-xs text-text-muted">{label}</span>
               </div>
-              <span className={`text-sm font-medium ${warn ? 'text-danger font-semibold' : 'text-text-primary'}`}>{value}</span>
+              <span className={`text-xs sm:text-sm font-medium ${warn ? 'text-danger font-semibold' : 'text-text-primary'}`}>{value}</span>
             </div>
           ))}
         </div>
@@ -99,7 +99,7 @@ export function TaskDetailDrawer({ task, onClose }: TaskDetailDrawerProps) {
         {/* Employee Actions */}
         {showCompleteBtn && (
           <Button
-            className="w-full mt-4"
+            className="w-full mt-4 justify-center text-xs sm:text-sm font-medium"
             icon={<CheckSquare size={16} />}
             loading={completeMutation.isPending}
             onClick={() => completeMutation.mutate(task.id)}

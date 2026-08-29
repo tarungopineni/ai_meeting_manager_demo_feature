@@ -43,9 +43,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="dark min-h-screen bg-surface-base flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="dark min-h-screen bg-surface-base flex items-center justify-center p-3 sm:p-6 relative max-w-full overflow-x-hidden">
       {/* Background Plasma effect */}
-      <div className="absolute inset-0 pointer-events-none z-0">
+      <div className="fixed inset-0 pointer-events-none z-0">
         <Plasma 
           color="#6366f1"
           speed={0.2}
@@ -56,22 +56,22 @@ export default function LoginPage() {
         />
       </div>
 
-      <div className="w-full max-w-sm relative z-10">
+      <div className="w-full max-w-[340px] sm:max-w-sm relative z-10 my-auto">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex w-12 h-12 rounded-2xl bg-accent items-center justify-center mb-4 glow-accent">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex w-12 h-12 rounded-2xl bg-accent items-center justify-center mb-3 sm:mb-4 glow-accent">
             <span className="text-white font-bold text-lg">EM</span>
           </div>
-          <h1 className="text-2xl font-bold text-text-primary">Welcome back</h1>
-          <p className="text-sm text-text-muted mt-1">Sign in to your account to continue</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Welcome back</h1>
+          <p className="text-xs sm:text-sm text-text-muted mt-1">Sign in to your account to continue</p>
         </div>
 
         {/* Card */}
-        <div className="card p-6 shadow-2xl">
+        <div className="card p-4 sm:p-6 shadow-2xl">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Username */}
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-text-secondary">Username</label>
+              <label className="block text-xs sm:text-sm font-medium text-text-secondary">Username</label>
               <div className="relative">
                 <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
                 <input
@@ -79,7 +79,7 @@ export default function LoginPage() {
                   id="username"
                   autoComplete="username"
                   placeholder="Enter your username"
-                  className={`input-base pl-9 ${errors.username ? 'border-danger focus:ring-danger' : ''}`}
+                  className={`input-base pl-9 text-xs sm:text-sm ${errors.username ? 'border-danger focus:ring-danger' : ''}`}
                 />
               </div>
               {errors.username && <p className="text-xs text-danger">{errors.username.message}</p>}
@@ -87,7 +87,7 @@ export default function LoginPage() {
 
             {/* Password */}
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-text-secondary">Password</label>
+              <label className="block text-xs sm:text-sm font-medium text-text-secondary">Password</label>
               <div className="relative">
                 <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
                 <input
@@ -96,12 +96,12 @@ export default function LoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   placeholder="Enter your password"
-                  className={`input-base pl-9 pr-10 ${errors.password ? 'border-danger focus:ring-danger' : ''}`}
+                  className={`input-base pl-9 pr-10 text-xs sm:text-sm ${errors.password ? 'border-danger focus:ring-danger' : ''}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center cursor-pointer"
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -115,18 +115,18 @@ export default function LoginPage() {
                 {...register('remember')}
                 id="remember"
                 type="checkbox"
-                className="w-4 h-4 rounded border-surface-border bg-surface-raised accent-accent"
+                className="w-4 h-4 rounded border-surface-border bg-surface-raised accent-accent cursor-pointer"
               />
-              <label htmlFor="remember" className="text-sm text-text-secondary">Remember me</label>
+              <label htmlFor="remember" className="text-xs sm:text-sm text-text-secondary cursor-pointer">Remember me</label>
             </div>
 
-            <Button type="submit" loading={isSubmitting} className="w-full">
+            <Button type="submit" loading={isSubmitting} className="w-full h-10 text-xs sm:text-sm font-medium">
               {isSubmitting ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>
         </div>
 
-        <p className="text-center text-xs text-text-muted mt-6">
+        <p className="text-center text-[11px] sm:text-xs text-text-muted mt-6">
           Employee Management System • Secure Portal
         </p>
       </div>

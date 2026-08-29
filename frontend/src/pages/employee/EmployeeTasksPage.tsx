@@ -76,8 +76,8 @@ export default function EmployeeTasksPage() {
   return (
     <AppShell title="My Tasks" subtitle="Tasks assigned directly to you">
       {/* Dynamic Tab Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-surface-border mb-6">
-        <div className="flex gap-1">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-surface-border mb-6">
+        <div className="flex overflow-x-auto gap-1 pb-1 md:pb-0 scrollbar-none max-w-full touch-pan-x">
           {[
             { key: 'all', label: 'All Tasks', count: badgeCounts.all, icon: <CheckSquare size={14} /> },
             { key: 'verified', label: 'Verified', count: badgeCounts.verified, icon: <ShieldCheck size={14} /> },
@@ -86,7 +86,7 @@ export default function EmployeeTasksPage() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key as TabType)}
-              className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-xs font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
                 activeTab === tab.key
                   ? 'border-accent text-accent'
                   : 'border-transparent text-text-muted hover:text-text-secondary'
@@ -104,12 +104,12 @@ export default function EmployeeTasksPage() {
         </div>
 
         {/* Priority Filter */}
-        <div className="flex items-center gap-2 pb-2 md:pb-0">
-          <Filter size={13} className="text-text-muted" />
+        <div className="flex items-center gap-2 pb-2 md:pb-0 w-full sm:w-auto">
+          <Filter size={13} className="text-text-muted flex-shrink-0" />
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
-            className="input-base text-xs w-36"
+            className="input-base text-xs w-full sm:w-36"
           >
             <option value="">All Priorities</option>
             <option value="HIGH">High</option>
@@ -124,9 +124,9 @@ export default function EmployeeTasksPage() {
 
         {/* Grid: Task Cards */}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="card p-5 animate-pulse space-y-3">
+              <div key={i} className="card p-4 sm:p-5 animate-pulse space-y-3">
                 <div className="h-4 bg-surface-raised rounded w-2/3" />
                 <div className="h-3 bg-surface-raised rounded w-full" />
                 <div className="h-6 bg-surface-raised rounded w-1/4" />
@@ -134,20 +134,20 @@ export default function EmployeeTasksPage() {
             ))}
           </div>
         ) : filteredTasks.length === 0 ? (
-          <div className="card p-12 text-center">
+          <div className="card p-8 sm:p-12 text-center">
             <CheckSquare size={36} className="text-text-muted mx-auto mb-3" />
-            <h3 className="text-text-primary font-medium text-sm">No tasks found</h3>
-            <p className="text-xs text-text-muted mt-1">Adjust filters or check back later</p>
+            <h3 className="text-text-primary font-medium text-xs sm:text-sm">No tasks found</h3>
+            <p className="text-[11px] sm:text-xs text-text-muted mt-1">Adjust filters or check back later</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {filteredTasks.map((t) => {
               const isTaskOverdue = t.deadline && isOverdue(t.deadline) && !t.completed
               return (
                 <ParticleCard
                   key={t.id}
                   onClick={() => openTaskDrawer(t)}
-                  className="card group p-5 flex flex-col justify-between cursor-pointer"
+                  className="card group p-4 sm:p-5 flex flex-col justify-between cursor-pointer"
                   style={{
                     '--glow-color': '99, 102, 241',
                   } as React.CSSProperties}

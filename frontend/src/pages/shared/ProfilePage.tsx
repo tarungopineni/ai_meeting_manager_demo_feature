@@ -46,21 +46,23 @@ export default function ProfilePage() {
     <AppShell title="Profile" subtitle="Your account details">
       <div className="max-w-2xl space-y-6">
         {/* Profile card */}
-        <div className="card p-6">
-          <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-accent/20 flex items-center justify-center text-accent font-bold text-2xl uppercase">
+        <div className="card p-4 sm:p-6">
+          <div className="flex items-center gap-3 sm:gap-5">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-accent/20 flex items-center justify-center text-accent font-bold text-xl sm:text-2xl uppercase flex-shrink-0">
               {user?.username?.[0] ?? '?'}
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-text-primary">{user?.username}</h2>
-              <RoleBadge role={user?.role ?? 'employee'} />
-              <p className="text-xs text-text-muted mt-1">ID: #{user?.id}</p>
+            <div className="min-w-0">
+              <h2 className="text-base sm:text-lg font-semibold text-text-primary truncate">{user?.username}</h2>
+              <div className="mt-1">
+                <RoleBadge role={user?.role ?? 'employee'} />
+              </div>
+              <p className="text-[11px] sm:text-xs text-text-muted mt-1">ID: #{user?.id}</p>
             </div>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-surface-raised rounded-lg w-fit">
+        <div className="flex gap-1 p-1 bg-surface-raised rounded-lg w-full sm:w-fit">
           {[
             { key: 'info',        label: 'Account Info',   icon: <User size={14} /> },
             { key: 'credentials', label: 'Update Login',   icon: <Key size={14} /> },
@@ -68,7 +70,7 @@ export default function ProfilePage() {
             <button
               key={key}
               onClick={() => setSection(key as typeof section)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all cursor-pointer ${
                 section === key
                   ? 'bg-surface-card text-text-primary shadow-sm border border-surface-border'
                   : 'text-text-muted hover:text-text-secondary'
@@ -80,7 +82,7 @@ export default function ProfilePage() {
         </div>
 
         {section === 'info' && (
-          <div className="card p-6 space-y-3">
+          <div className="card p-4 sm:p-6 space-y-3">
             <h3 className="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
               <Shield size={14} className="text-accent" />
               Account Information
@@ -91,15 +93,15 @@ export default function ProfilePage() {
               { label: 'User ID',  value: `#${user?.id}` },
             ].map(({ label, value }) => (
               <div key={label} className="flex items-center justify-between py-3 border-b border-surface-border/50 last:border-0">
-                <span className="text-sm text-text-muted">{label}</span>
-                <span className="text-sm font-medium text-text-primary">{value}</span>
+                <span className="text-xs sm:text-sm text-text-muted">{label}</span>
+                <span className="text-xs sm:text-sm font-medium text-text-primary">{value}</span>
               </div>
             ))}
           </div>
         )}
 
         {section === 'credentials' && (
-          <div className="card p-6">
+          <div className="card p-4 sm:p-6">
             <h3 className="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
               <Key size={14} className="text-accent" />
               Update Login Credentials
@@ -108,7 +110,7 @@ export default function ProfilePage() {
               <Input label="Username" {...register('username')} error={errors.username?.message} />
               <Input label="New Password" {...register('password')} error={errors.password?.message} type="password" />
               <Input label="Confirm Password" {...register('confirm')} error={errors.confirm?.message} type="password" />
-              <Button type="submit" loading={mutation.isPending} className="w-full">
+              <Button type="submit" loading={mutation.isPending} className="w-full justify-center">
                 Update Credentials
               </Button>
             </form>

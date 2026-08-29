@@ -132,7 +132,7 @@ export default function EmployeeDashboard() {
       )}
 
       {/* Grid: Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6">
         <StatCard label="Total Tasks" value={allTasks.length} icon={CheckSquare} iconColor="text-accent" />
         <StatCard label="Pending" value={pendingTasks} icon={Clock} iconColor="text-warning" />
         <StatCard label="Completed" value={completedTasks} icon={TrendingUp} iconColor="text-success" />
@@ -141,15 +141,15 @@ export default function EmployeeDashboard() {
         <StatCard label="Overdue" value={overdueCount} icon={AlertTriangle} iconColor="text-danger" />
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mb-6">
         {/* Performance Rings / Summary */}
-        <div className="card p-5">
+        <div className="card p-4 sm:p-5">
           <h3 className="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
             <TrendingUp size={14} className="text-accent" />
             Productivity Rating
           </h3>
-          <div className="text-center py-6">
-            <div className="text-4xl font-bold text-gradient font-mono mb-1">{pct}</div>
+          <div className="text-center py-5 sm:py-6">
+            <div className="text-3xl sm:text-4xl font-bold text-gradient font-mono mb-1">{pct}</div>
             <p className="text-xs text-text-muted">Task Completion Ratio</p>
           </div>
           <div className="h-2 bg-surface-raised rounded-full overflow-hidden mt-3">
@@ -165,12 +165,12 @@ export default function EmployeeDashboard() {
         </div>
 
         {/* Priority breakdown chart */}
-        <div className="card p-5">
+        <div className="card p-4 sm:p-5">
           <h3 className="text-sm font-semibold text-text-primary mb-2 flex items-center gap-2">
             <Calendar size={14} className="text-accent" />
             Tasks by Priority
           </h3>
-          <div className="h-44 font-mono text-[10px]">
+          <div className="h-48 sm:h-44 font-mono text-[10px]">
             {priorityChartData.length === 0 ? (
               <p className="text-center py-16 text-text-muted">No task priorities recorded</p>
             ) : (
@@ -179,9 +179,9 @@ export default function EmployeeDashboard() {
                   <Pie
                     data={priorityChartData}
                     cx="50%"
-                    cy="50%"
-                    innerRadius={50}
-                    outerRadius={65}
+                    cy="45%"
+                    innerRadius={35}
+                    outerRadius={55}
                     paddingAngle={3}
                     dataKey="value"
                   >
@@ -190,10 +190,10 @@ export default function EmployeeDashboard() {
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ background: '#111118', border: '1px solid #2a2a35', borderRadius: '8px' }}
+                    contentStyle={{ background: '#111118', border: '1px solid #2a2a35', borderRadius: '8px', fontSize: '11px' }}
                     labelStyle={{ color: '#f1f1f5' }}
                   />
-                  <Legend verticalAlign="bottom" height={24} />
+                  <Legend verticalAlign="bottom" height={28} wrapperStyle={{ fontSize: '11px', paddingTop: '4px' }} />
                 </PieChart>
               </ResponsiveContainer>
             )}
@@ -201,7 +201,7 @@ export default function EmployeeDashboard() {
         </div>
 
         {/* Countdown / Nearest Deadline Widget */}
-        <div className="card p-5 flex flex-col justify-between">
+        <div className="card p-4 sm:p-5 flex flex-col justify-between">
           <div>
             <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
               <Clock size={14} className="text-warning" />
@@ -209,10 +209,10 @@ export default function EmployeeDashboard() {
             </h3>
             {nearestTask ? (
               <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-text-primary truncate">{nearestTask.title}</h4>
-                <div className="flex gap-2">
+                <h4 className="text-xs sm:text-sm font-semibold text-text-primary truncate">{nearestTask.title}</h4>
+                <div className="flex flex-wrap gap-2">
                   <PriorityBadge priority={nearestTask.priority} />
-                  <span className="text-xs text-text-muted">
+                  <span className="text-[11px] sm:text-xs text-text-muted">
                     Due: {nearestTask.deadline_text ?? formatDate(nearestTask.deadline)}
                   </span>
                 </div>
@@ -224,17 +224,17 @@ export default function EmployeeDashboard() {
           {nearestTask && timeLeft && (
             <div className="mt-4 pt-4 border-t border-surface-border/55">
               <p className="text-[10px] text-text-muted mb-1">Time Remaining</p>
-              <div className="text-3xl font-mono font-bold text-warning">{timeLeft}</div>
+              <div className="text-2xl sm:text-3xl font-mono font-bold text-warning">{timeLeft}</div>
             </div>
           )}
         </div>
       </div>
 
       {/* Grid: Upcoming tasks + Activity Timeline */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Upcoming pending tasks */}
         <div className="card lg:col-span-2 overflow-hidden">
-          <div className="px-5 py-4 border-b border-surface-border">
+          <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-surface-border">
             <h3 className="text-sm font-semibold text-text-primary">Upcoming Tasks</h3>
           </div>
           <div className="divide-y divide-surface-border/50">
@@ -245,15 +245,15 @@ export default function EmployeeDashboard() {
                 <div
                   key={t.id}
                   onClick={() => openTaskDrawer(t)}
-                  className="px-5 py-3.5 flex items-center justify-between hover:bg-surface-raised/50 transition-colors cursor-pointer"
+                  className="px-4 sm:px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-surface-raised/50 transition-colors cursor-pointer"
                 >
-                  <div className="min-w-0 flex-1 pr-4">
-                    <p className="text-sm font-medium text-text-primary truncate">{t.title}</p>
-                    <p className="text-xs text-text-muted mt-0.5 line-clamp-1">{t.description || 'No description provided.'}</p>
+                  <div className="min-w-0 flex-1 pr-2">
+                    <p className="text-xs sm:text-sm font-medium text-text-primary truncate">{t.title}</p>
+                    <p className="text-[11px] sm:text-xs text-text-muted mt-0.5 line-clamp-1">{t.description || 'No description provided.'}</p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 flex-shrink-0">
                     <PriorityBadge priority={t.priority} />
-                    <span className={`text-xs ${t.deadline && isOverdue(t.deadline) ? 'text-danger font-semibold' : 'text-text-secondary'}`}>
+                    <span className={`text-[11px] sm:text-xs ${t.deadline && isOverdue(t.deadline) ? 'text-danger font-semibold' : 'text-text-secondary'}`}>
                       {t.deadline_text ?? formatDate(t.deadline)}
                     </span>
                   </div>
@@ -264,16 +264,16 @@ export default function EmployeeDashboard() {
         </div>
 
         {/* Recent timeline widgets */}
-        <div className="card p-5">
+        <div className="card p-4 sm:p-5">
           <h3 className="text-sm font-semibold text-text-primary mb-4">Task Status Distribution</h3>
-          <div className="h-44 font-mono text-[10px]">
+          <div className="h-48 sm:h-44 font-mono text-[10px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={statusChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <BarChart data={statusChartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="2 2" stroke="#1e1e28" vertical={false} />
-                <XAxis dataKey="name" stroke="#60607a" />
-                <YAxis stroke="#60607a" allowDecimals={false} />
+                <XAxis dataKey="name" stroke="#60607a" tick={{ fontSize: 10 }} />
+                <YAxis stroke="#60607a" allowDecimals={false} tick={{ fontSize: 10 }} width={25} />
                 <Tooltip
-                  contentStyle={{ background: '#111118', border: '1px solid #2a2a35', borderRadius: '8px' }}
+                  contentStyle={{ background: '#111118', border: '1px solid #2a2a35', borderRadius: '8px', fontSize: '11px' }}
                 />
                 <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} />
               </BarChart>

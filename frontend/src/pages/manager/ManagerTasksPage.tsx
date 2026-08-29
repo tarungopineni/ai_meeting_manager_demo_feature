@@ -256,16 +256,16 @@ export default function ManagerTasksPage() {
     )},
     { key: 'status', label: 'Status', render: (t: Task) => <StatusBadge completed={t.completed} verified={t.verified_by_manager} approved={t.approved_by_manager} /> },
     { key: 'actions', label: '', width: '180px', render: (t: Task) => (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         {t.completed && !t.verified_by_manager && (
-          <Button size="sm" variant="secondary" icon={<ShieldCheck size={12} />} onClick={() => verifyMutation.mutate(t.id)} loading={verifyMutation.isPending && verifyMutation.variables === t.id}>
+          <Button size="sm" variant="secondary" icon={<ShieldCheck size={12} />} onClick={() => verifyMutation.mutate(t.id)} loading={verifyMutation.isPending && verifyMutation.variables === t.id} className="px-2.5 py-1 text-xs whitespace-nowrap">
             Verify
           </Button>
         )}
         <Button 
           size="sm" 
           variant="ghost" 
-          className="text-danger hover:text-danger hover:bg-danger/10" 
+          className="text-danger hover:text-danger hover:bg-danger/10 px-2 py-1 text-xs whitespace-nowrap" 
           icon={<Trash2 size={12} />} 
           onClick={(e) => {
             e.stopPropagation()
@@ -283,23 +283,23 @@ export default function ManagerTasksPage() {
 
   return (
     <AppShell title="Team Tasks" subtitle="Monitor and verify your team's work">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Filter size={14} className="text-text-muted" />
-          <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="input-base text-xs w-32">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Filter size={14} className="text-text-muted flex-shrink-0" />
+          <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="input-base text-xs flex-1 sm:flex-initial sm:w-32">
             <option value="">All Priorities</option>
             <option value="HIGH">High</option>
             <option value="MEDIUM">Medium</option>
             <option value="LOW">Low</option>
           </select>
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="input-base text-xs w-36">
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="input-base text-xs flex-1 sm:flex-initial sm:w-36">
             <option value="">All Status</option>
             <option value="in_progress">In Progress</option>
             <option value="pending_review">Pending Review</option>
             <option value="verified">Verified</option>
           </select>
         </div>
-        <Button onClick={() => setShowAssign(true)} icon={<Plus size={14} />}>Assign Task</Button>
+        <Button onClick={() => setShowAssign(true)} icon={<Plus size={14} />} className="w-full sm:w-auto justify-center">Assign Task</Button>
       </div>
 
       <DataTable

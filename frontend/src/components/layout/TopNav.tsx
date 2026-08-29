@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Bell, Search, AlertTriangle, ShieldAlert, CheckCircle, Calendar, Clock } from 'lucide-react'
+import { Bell, Search, AlertTriangle, ShieldAlert, CheckCircle, Calendar, Clock, Menu } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
@@ -11,6 +11,7 @@ import { meetingsService } from '@/api/meetings.service'
 interface TopNavProps {
   title: string
   subtitle?: string
+  onOpenMobileMenu?: () => void
 }
 
 interface AlertItem {
@@ -22,7 +23,7 @@ interface AlertItem {
   action: () => void
 }
 
-export function TopNav({ title, subtitle }: TopNavProps) {
+export function TopNav({ title, subtitle, onOpenMobileMenu }: TopNavProps) {
   const [showNotifications, setShowNotifications] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
@@ -183,13 +184,22 @@ export function TopNav({ title, subtitle }: TopNavProps) {
   }
 
   return (
-    <header className="fixed top-0 left-60 right-0 h-14 flex items-center justify-between
-                       px-6 bg-surface-base/80 backdrop-blur-md border-b border-surface-border z-20">
-      <div>
-        <h1 className="font-semibold text-text-primary text-base leading-none">{title}</h1>
-        {subtitle && <p className="text-xs text-text-muted mt-0.5">{subtitle}</p>}
+    <header className="fixed top-0 left-0 lg:left-60 right-0 h-14 flex items-center justify-between
+                       px-3 sm:px-6 bg-surface-base/80 backdrop-blur-md border-b border-surface-border z-20">
+      <div className="flex items-center gap-2 min-w-0">
+        <button
+          onClick={onOpenMobileMenu}
+          className="lg:hidden p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-raised transition-colors flex-shrink-0 cursor-pointer"
+          title="Open menu"
+        >
+          <Menu size={20} />
+        </button>
+        <div className="min-w-0">
+          <h1 className="font-semibold text-text-primary text-sm sm:text-base leading-none truncate">{title}</h1>
+          {subtitle && <p className="text-[11px] sm:text-xs text-text-muted mt-0.5 truncate">{subtitle}</p>}
+        </div>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
         {/* Search trigger */}
         <button
           onClick={triggerSearch}
@@ -215,7 +225,7 @@ export function TopNav({ title, subtitle }: TopNavProps) {
 
           {/* Dropdown Panel */}
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 bg-surface-card border border-surface-border rounded-xl shadow-2xl overflow-hidden z-50 animate-slide-in-up">
+            <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-surface-card border border-surface-border rounded-xl shadow-2xl overflow-hidden z-50 animate-slide-in-up">
               <div className="px-4 py-3 border-b border-surface-border flex items-center justify-between">
                 <span className="text-xs font-semibold text-text-primary">Notifications</span>
                 <div className="flex items-center gap-2">

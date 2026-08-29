@@ -19,13 +19,13 @@
   }
 
   html {
-    @apply bg-surface-base text-text-primary font-sans;
+    @apply bg-surface-base text-text-primary font-sans max-w-full overflow-x-hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    @apply bg-surface-base text-text-primary;
+    @apply bg-surface-base text-text-primary max-w-full overflow-x-hidden;
     min-height: 100vh;
   }
 

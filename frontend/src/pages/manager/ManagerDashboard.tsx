@@ -57,17 +57,17 @@ export default function ManagerDashboard() {
     <AppShell title="Manager Dashboard" subtitle="Your team's performance overview">
       <div>
         {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <StatCard label="Team Members"    value={team.length}      icon={Users}        iconColor="text-accent" />
         <StatCard label="Total Tasks"     value={staffTasks.length} icon={CheckSquare}  iconColor="text-info" />
         <StatCard label="Completed"       value={completedTasks}   icon={TrendingUp}   iconColor="text-success" />
         <StatCard label="Pending"         value={pendingTasks}     icon={Clock}        iconColor="text-warning" />
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mb-6">
         {/* Performance summary card */}
         <ParticleCard
-          className="card group p-5 flex flex-col justify-between"
+          className="card group p-4 sm:p-5 flex flex-col justify-between"
           style={{
             '--glow-color': '99, 102, 241',
           } as React.CSSProperties}
@@ -84,7 +84,7 @@ export default function ManagerDashboard() {
                 Team Performance
               </h3>
               <div className="text-center py-4">
-                <div className="text-4xl font-bold text-gradient font-mono mb-1">{pct}</div>
+                <div className="text-3xl sm:text-4xl font-bold text-gradient font-mono mb-1">{pct}</div>
                 <p className="text-xs text-text-muted">Completion Rate</p>
               </div>
             </div>
@@ -105,7 +105,7 @@ export default function ManagerDashboard() {
 
         {/* Warning zone card with email trigger button */}
         <ParticleCard
-          className="card group p-5 flex flex-col justify-between"
+          className="card group p-4 sm:p-5 flex flex-col justify-between"
           style={{
             '--glow-color': '99, 102, 241',
           } as React.CSSProperties}
@@ -127,7 +127,7 @@ export default function ManagerDashboard() {
             </div>
             <Button
               variant="secondary"
-              className="w-full mt-4"
+              className="w-full mt-4 justify-center text-xs sm:text-sm font-medium"
               icon={<Mail size={14} />}
               loading={emailMutation.isPending}
               onClick={(e) => {
@@ -142,7 +142,7 @@ export default function ManagerDashboard() {
 
         {/* Top performers ranking list */}
         <ParticleCard
-          className="card group p-5 flex flex-col justify-between"
+          className="card group p-4 sm:p-5 flex flex-col justify-between"
           style={{
             '--glow-color': '99, 102, 241',
           } as React.CSSProperties}
@@ -158,8 +158,8 @@ export default function ManagerDashboard() {
               <div className="space-y-2 w-full">
                 {topPerformers.map((p, idx) => (
                   <div key={p.name} className="flex items-center justify-between p-2 bg-surface-raised/40 border border-surface-border rounded-lg">
-                    <span className="text-xs font-semibold text-text-primary">#{idx + 1} {p.name}</span>
-                    <span className="text-[10px] text-text-muted font-mono">{p.completed} / {p.total} completed</span>
+                    <span className="text-xs font-semibold text-text-primary truncate max-w-[140px] sm:max-w-[180px]">#{idx + 1} {p.name}</span>
+                    <span className="text-[10px] text-text-muted font-mono flex-shrink-0">{p.completed} / {p.total} completed</span>
                   </div>
                 ))}
               </div>
@@ -168,10 +168,10 @@ export default function ManagerDashboard() {
         </ParticleCard>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
         {/* Verification Queue preview */}
         <div className="card xl:col-span-2 overflow-hidden">
-          <div className="px-5 py-4 border-b border-surface-border flex items-center justify-between">
+          <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-surface-border flex items-center justify-between">
             <h3 className="text-sm font-semibold text-text-primary">Awaiting Verification</h3>
             <Button size="sm" variant="ghost" onClick={() => navigate('/manager/verification')}>
               View Queue
@@ -185,10 +185,10 @@ export default function ManagerDashboard() {
                 <div
                   key={t.id}
                   onClick={() => openTaskDrawer(t)}
-                  className="px-5 py-3 flex items-center justify-between hover:bg-surface-raised/55 transition-colors cursor-pointer"
+                  className="px-4 sm:px-5 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-surface-raised/55 transition-colors cursor-pointer"
                 >
-                  <span className="text-xs font-semibold text-text-primary truncate max-w-[60%]">{t.title}</span>
-                  <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-text-primary truncate">{t.title}</span>
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[10px] text-text-muted">by {userMap[t.assignee_id]}</span>
                     <StatusBadge completed={t.completed} verified={t.verified_by_manager} approved={t.approved_by_manager} />
                     <PriorityBadge priority={t.priority} />

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Sidebar } from './Sidebar'
 import { TopNav } from './TopNav'
 import { CommandPalette } from '../shared/CommandPalette'
@@ -13,6 +13,7 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, title, subtitle }: AppShellProps) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { task, close } = useTaskDrawerStore()
 
   useEffect(() => {
@@ -63,7 +64,7 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
   }, [])
 
   return (
-    <div className="dark min-h-screen bg-surface-base relative overflow-hidden">
+    <div className="dark min-h-screen bg-surface-base relative max-w-full overflow-x-hidden">
       {/* Background Plasma effect */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <Plasma 
@@ -76,12 +77,16 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
         />
       </div>
 
-      <div className="relative z-10">
-        <Sidebar />
-        <div className="ml-60">
-          <TopNav title={title} subtitle={subtitle} />
-          <main className="pt-14 min-h-screen">
-            <div className="p-6 animate-fade-in">
+      <div className="relative z-10 min-h-screen max-w-full overflow-x-hidden">
+        <Sidebar isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+        <div className="ml-0 lg:ml-60 min-h-screen max-w-full overflow-x-hidden transition-all duration-300">
+          <TopNav
+            title={title}
+            subtitle={subtitle}
+            onOpenMobileMenu={() => setMobileMenuOpen(true)}
+          />
+          <main className="pt-14 min-h-screen max-w-full overflow-x-hidden">
+            <div className="p-3 sm:p-6 animate-fade-in max-w-full overflow-x-hidden">
               {children}
             </div>
           </main>

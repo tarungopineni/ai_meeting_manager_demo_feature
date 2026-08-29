@@ -1,7 +1,8 @@
+import { useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Users, Calendar, CheckSquare, User,
-  LogOut, ChevronRight, Briefcase, Shield, TrendingUp, ShieldCheck
+  LogOut, ChevronRight, Briefcase, Shield, TrendingUp, ShieldCheck, X
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { cn } from '@/utils'
@@ -11,6 +12,11 @@ interface NavItem {
   label: string
   to: string
   icon: React.ReactNode
+}
+
+interface SidebarProps {
+  isOpen?: boolean
+  onClose?: () => void
 }
 
 const navByRole: Record<Role, NavItem[]> = {
@@ -48,68 +54,107 @@ const roleIcon: Record<Role, React.ReactNode> = {
   dev:         <ChevronRight size={12} className="text-warning" />,
 }
 
-export function Sidebar() {
+export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
   const role = user?.role ?? 'employee'
   const items = navByRole[role] ?? []
 
+  // Close on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && onClose) {
+        onClose()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
   function handleLogout() {
+    onClose?.()
     logout()
     navigate('/login')
   }
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-60 flex flex-col bg-surface-card/85 backdrop-blur-md border-r border-surface-border z-30">
-      {/* Logo */}
-      <div className="flex items-center gap-2 px-5 py-5 border-b border-surface-border">
-        <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center">
-          <span className="text-white font-bold text-xs">EM</span>
-        </div>
-        <div>
-          <span className="font-semibold text-text-primary text-sm">EMS</span>
-          <p className="text-[10px] text-text-muted leading-none">Employee Management</p>
-        </div>
-      </div>
+    <>
+      {/* Mobile backdrop overlay */}
+      {isOpen && (
+        <div
+          onClick={onClose}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden animate-fade-in"
+        />
+      )}
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        {items.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={({ isActive }) =>
-              cn('sidebar-item', isActive && 'active')
-            }
-          >
-            <span className="opacity-70">{item.icon}</span>
-            {item.label}
-          </NavLink>
-        ))}
-      </nav>
-
-      {/* User footer */}
-      <div className="px-3 py-3 border-t border-surface-border">
-        <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-raised mb-2">
-          <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent font-semibold text-sm uppercase">
-            {user?.username?.[0] ?? '?'}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-text-primary truncate">{user?.username}</p>
-            <div className="flex items-center gap-1">
-              {roleIcon[role as Role]}
-              <p className="text-[10px] text-text-muted capitalize">{role}</p>
+      <aside
+        className={cn(
+          'fixed left-0 top-0 h-screen w-60 flex flex-col bg-surface-card/95 backdrop-blur-md border-r border-surface-border z-40',
+          'transition-transform duration-300 ease-in-out lg:translate-x-0',
+          isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+        )}
+      >
+        {/* Logo and Mobile Close button */}
+        <div className="flex items-center justify-between px-5 py-5 border-b border-surface-border">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center">
+              <span className="text-white font-bold text-xs">EM</span>
+            </div>
+            <div>
+              <span className="font-semibold text-text-primary text-sm">EMS</span>
+              <p className="text-[10px] text-text-muted leading-none">Employee Management</p>
             </div>
           </div>
+          {/* Close button on mobile view */}
+          <button
+            onClick={onClose}
+            className="lg:hidden p-1.5 text-text-muted hover:text-text-primary rounded-lg hover:bg-surface-raised transition-colors"
+            title="Close menu"
+          >
+            <X size={18} />
+          </button>
         </div>
-        <button
-          onClick={handleLogout}
-          className="w-full sidebar-item text-danger hover:text-danger hover:bg-danger/10"
-        >
-          <LogOut size={16} />
-          Sign out
-        </button>
-      </div>
-    </aside>
+
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+          {items.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              onClick={() => onClose?.()}
+              className={({ isActive }) =>
+                cn('sidebar-item', isActive && 'active')
+              }
+            >
+              <span className="opacity-70">{item.icon}</span>
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+
+        {/* User footer */}
+        <div className="px-3 py-3 border-t border-surface-border">
+          <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-raised mb-2">
+            <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent font-semibold text-sm uppercase">
+              {user?.username?.[0] ?? '?'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium text-text-primary truncate">{user?.username}</p>
+              <div className="flex items-center gap-1">
+                {roleIcon[role as Role]}
+                <p className="text-[10px] text-text-muted capitalize">{role}</p>
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="w-full sidebar-item text-danger hover:text-danger hover:bg-danger/10"
+          >
+            <LogOut size={16} />
+            Sign out
+          </button>
+        </div>
+      </aside>
+    </>
   )
 }
