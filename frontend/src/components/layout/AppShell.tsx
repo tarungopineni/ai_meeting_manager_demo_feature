@@ -20,35 +20,45 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
   const isDemo = user?.is_demo
 
   useEffect(() => {
+    let ticking = false
+
     const handleMouseMove = (e: MouseEvent) => {
-      const cards = document.querySelectorAll('.card')
-      const spotlightRadius = 300
-      const proximity = spotlightRadius * 0.5
-      const fadeDistance = spotlightRadius * 0.75
+      if (ticking) return
+      ticking = true
 
-      cards.forEach((card) => {
-        const cardElement = card as HTMLElement
-        const cardRect = cardElement.getBoundingClientRect()
-        const centerX = cardRect.left + cardRect.width / 2
-        const centerY = cardRect.top + cardRect.height / 2
-        const distance =
-          Math.hypot(e.clientX - centerX, e.clientY - centerY) - Math.max(cardRect.width, cardRect.height) / 2
-        const effectiveDistance = Math.max(0, distance)
+      requestAnimationFrame(() => {
+        ticking = false
+        const cards = document.querySelectorAll('.card')
+        if (cards.length === 0) return
 
-        let glowIntensity = 0
-        if (effectiveDistance <= proximity) {
-          glowIntensity = 1
-        } else if (effectiveDistance <= fadeDistance) {
-          glowIntensity = (fadeDistance - effectiveDistance) / (fadeDistance - proximity)
-        }
+        const spotlightRadius = 300
+        const proximity = spotlightRadius * 0.5
+        const fadeDistance = spotlightRadius * 0.75
 
-        const relativeX = ((e.clientX - cardRect.left) / cardRect.width) * 100
-        const relativeY = ((e.clientY - cardRect.top) / cardRect.height) * 100
+        cards.forEach((card) => {
+          const cardElement = card as HTMLElement
+          const cardRect = cardElement.getBoundingClientRect()
+          const centerX = cardRect.left + cardRect.width / 2
+          const centerY = cardRect.top + cardRect.height / 2
+          const distance =
+            Math.hypot(e.clientX - centerX, e.clientY - centerY) - Math.max(cardRect.width, cardRect.height) / 2
+          const effectiveDistance = Math.max(0, distance)
 
-        cardElement.style.setProperty('--glow-x', `${relativeX}%`)
-        cardElement.style.setProperty('--glow-y', `${relativeY}%`)
-        cardElement.style.setProperty('--glow-intensity', glowIntensity.toString())
-        cardElement.style.setProperty('--glow-radius', `${spotlightRadius}px`)
+          let glowIntensity = 0
+          if (effectiveDistance <= proximity) {
+            glowIntensity = 1
+          } else if (effectiveDistance <= fadeDistance) {
+            glowIntensity = (fadeDistance - effectiveDistance) / (fadeDistance - proximity)
+          }
+
+          const relativeX = ((e.clientX - cardRect.left) / cardRect.width) * 100
+          const relativeY = ((e.clientY - cardRect.top) / cardRect.height) * 100
+
+          cardElement.style.setProperty('--glow-x', `${relativeX}%`)
+          cardElement.style.setProperty('--glow-y', `${relativeY}%`)
+          cardElement.style.setProperty('--glow-intensity', glowIntensity.toString())
+          cardElement.style.setProperty('--glow-radius', `${spotlightRadius}px`)
+        })
       })
     }
 
@@ -58,7 +68,7 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
       })
     }
 
-    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mousemove', handleMouseMove, { passive: true })
     document.addEventListener('mouseleave', handleMouseLeave)
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)

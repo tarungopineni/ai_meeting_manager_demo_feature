@@ -47,7 +47,7 @@ void mainImage(out vec4 o, vec2 C) {
   float i = 0.0, d, z = 0.0, T = iTime * uSpeed * uDirection;
   vec3 O = vec3(0.0), p, S;
 
-  for (vec2 r = iResolution.xy, Q; i < 20.0; ) {
+  for (vec2 r = iResolution.xy, Q; i < 12.0; ) {
     i += 1.0;
     p = z*normalize(vec3(C-.5*r,r.y)); 
     p.z -= 4.; 
@@ -122,7 +122,7 @@ export const Plasma = ({
         webgl: 2,
         alpha: true,
         antialias: false,
-        dpr: Math.min(window.devicePixelRatio || 1, 2),
+        dpr: Math.min(window.devicePixelRatio || 1, 1.25),
       })
     } catch {
       return

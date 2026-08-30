@@ -30,7 +30,6 @@ export const ClickSpark = ({
 }: ClickSparkProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const sparksRef = useRef<Spark[]>([])
-  const startTimeRef = useRef<number | null>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -81,18 +80,18 @@ export const ClickSpark = ({
     [easing]
   )
 
-  useEffect(() => {
+  const isAnimatingRef = useRef(false)
+
+  const startAnimation = useCallback(() => {
+    if (isAnimatingRef.current) return
+    isAnimatingRef.current = true
+
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    let animationId: number
-
     const draw = (timestamp: number) => {
-      if (!startTimeRef.current) {
-        startTimeRef.current = timestamp
-      }
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       sparksRef.current = sparksRef.current.filter((spark) => {
@@ -122,15 +121,16 @@ export const ClickSpark = ({
         return true
       })
 
-      animationId = requestAnimationFrame(draw)
+      if (sparksRef.current.length > 0) {
+        requestAnimationFrame(draw)
+      } else {
+        isAnimatingRef.current = false
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+      }
     }
 
-    animationId = requestAnimationFrame(draw)
-
-    return () => {
-      cancelAnimationFrame(animationId)
-    }
-  }, [sparkColor, sparkSize, sparkRadius, sparkCount, duration, easeFunc, extraScale])
+    requestAnimationFrame(draw)
+  }, [duration, easeFunc, extraScale, sparkColor, sparkRadius, sparkSize])
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const canvas = canvasRef.current
@@ -148,6 +148,7 @@ export const ClickSpark = ({
     }))
 
     sparksRef.current.push(...newSparks)
+    startAnimation()
   }
 
   return (
