@@ -3,12 +3,17 @@ import { useAuthStore } from '@/store/authStore'
 
 const getBackendUrl = (): string => {
   const envUrl = import.meta.env.VITE_BACKEND_URL
-  if (envUrl && envUrl.trim()) {
-    return envUrl.trim().replace(/\/+$/, '')
-  }
 
   if (import.meta.env.DEV) {
-    return 'http://127.0.0.1:8001'
+    // In local dev mode, prefer local uvicorn unless explicitly configured with non-render URL
+    if (envUrl && envUrl.trim() && !envUrl.includes('onrender.com')) {
+      return envUrl.trim().replace(/\/+$/, '')
+    }
+    return 'http://127.0.0.1:8000'
+  }
+
+  if (envUrl && envUrl.trim()) {
+    return envUrl.trim().replace(/\/+$/, '')
   }
 
   // Fallback to production Render backend URL if VITE_BACKEND_URL is missing during build
