@@ -28,7 +28,7 @@
 
 ### Live Application
 
-**[Open the AI Meeting Manager](YOUR_VERCEL_URL_HERE)**
+**[Open the AI Meeting Manager](https://ai-meeting-manager-demo-feature.vercel.app/login)**
 
 ### How to use the Demo
 
