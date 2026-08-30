@@ -1,14 +1,24 @@
 from fastapi import APIRouter
-from ..database import SessionLocal, get_db
+try:
+    from ..database import SessionLocal, get_db
+    from ..models import *
+    from .auth import get_current_user
+except Exception:
+    try:
+        from backend.database import SessionLocal, get_db
+        from backend.models import *
+        from backend.routers.auth import get_current_user
+    except Exception:
+        from database import SessionLocal, get_db
+        from models import *
+        from auth import get_current_user
 from passlib.context import CryptContext
 from typing import Annotated, Optional
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-from ..models import *
 from starlette import status
-from .auth import get_current_user
 
 router = APIRouter(
     prefix="/users",

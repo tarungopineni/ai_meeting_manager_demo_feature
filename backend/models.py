@@ -1,4 +1,7 @@
-from .database import Base
+try:
+    from .database import Base
+except (ImportError, ValueError):
+    from database import Base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
 from datetime import datetime
 

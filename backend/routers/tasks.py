@@ -1,16 +1,28 @@
 import os
 from fastapi import APIRouter
-from ..database import SessionLocal, get_db
+try:
+    from ..database import SessionLocal, get_db
+    from ..models import *
+    from .auth import get_current_user
+    from .emails import *
+except Exception:
+    try:
+        from backend.database import SessionLocal, get_db
+        from backend.models import *
+        from backend.routers.auth import get_current_user
+        from backend.routers.emails import *
+    except Exception:
+        from database import SessionLocal, get_db
+        from models import *
+        from auth import get_current_user
+        from emails import *
 from typing import Annotated
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from pydantic import BaseModel
-from ..models import *
 from starlette import status
-from .auth import get_current_user
-from .emails import *
 
 load_dotenv()
 

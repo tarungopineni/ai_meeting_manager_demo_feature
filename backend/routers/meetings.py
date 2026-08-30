@@ -4,11 +4,23 @@ from typing_extensions import Annotated
 import whisper
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from ..database import SessionLocal, get_db
-from ..models import *
+try:
+    from ..database import SessionLocal, get_db
+    from ..models import *
+    from .auth import get_current_user
+    from .tasks import TaskRequest, create_task_db
+except Exception:
+    try:
+        from backend.database import SessionLocal, get_db
+        from backend.models import *
+        from backend.routers.auth import get_current_user
+        from backend.routers.tasks import TaskRequest, create_task_db
+    except Exception:
+        from database import SessionLocal, get_db
+        from models import *
+        from auth import get_current_user
+        from tasks import TaskRequest, create_task_db
 from datetime import datetime
-from .auth import get_current_user
-from .tasks import TaskRequest, create_task_db
 import json
 from openai import OpenAI
 from dotenv import load_dotenv

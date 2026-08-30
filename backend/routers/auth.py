@@ -1,7 +1,16 @@
 import os
 import secrets
 from fastapi import APIRouter
-from ..database import SessionLocal, get_db
+try:
+    from ..database import SessionLocal, get_db
+    from ..models import Users, Tasks, Meetings
+except Exception:
+    try:
+        from backend.database import SessionLocal, get_db
+        from backend.models import Users, Tasks, Meetings
+    except Exception:
+        from database import SessionLocal, get_db
+        from models import Users, Tasks, Meetings
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from typing import Annotated, Optional
@@ -9,7 +18,6 @@ from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException
 from datetime import datetime, timezone, timedelta
 from pydantic import BaseModel
-from ..models import Users, Tasks, Meetings
 from jose import jwt, JWTError
 from starlette import status
 from dotenv import load_dotenv

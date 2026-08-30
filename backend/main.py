@@ -2,8 +2,16 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import auth, users, tasks, meetings
-from .database import Base, engine
+try:
+    from .routers import auth, users, tasks, meetings
+    from .database import Base, engine
+except Exception:
+    try:
+        from backend.routers import auth, users, tasks, meetings
+        from backend.database import Base, engine
+    except Exception:
+        from routers import auth, users, tasks, meetings
+        from database import Base, engine
 
 app = FastAPI()
 
