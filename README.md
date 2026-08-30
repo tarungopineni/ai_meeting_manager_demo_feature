@@ -46,6 +46,12 @@ No registration or real account is required.
 
 The demo runs through the actual backend and authentication flow rather than using a frontend-only mock.
 
+The live deployment currently has a temporary limitation on the AI-powered meeting summary generation feature due to exhausted AI service usage limits.
+
+For the best evaluation experience, please do not upload or submit audio recordings to the AI summary generator during the live demo. While the application remains fully functional, summary generation may fall back to a predefined set of tasks instead of producing a new AI-generated analysis.
+
+The remaining functionality—including authentication, role switching, RBAC, task management, employee workflows, dashboards, and demo-session isolation—can be explored normally.
+
 ---
 
 ## Introduction
