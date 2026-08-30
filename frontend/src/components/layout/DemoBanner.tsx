@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { Sparkles, Shield, Briefcase, User, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/store/authStore'
@@ -16,6 +17,7 @@ const roles: { role: Role; label: string; icon: React.ReactNode }[] = [
 export function DemoBanner() {
   const { user, setToken } = useAuthStore()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [switchingRole, setSwitchingRole] = useState<Role | null>(null)
 
   if (!user?.is_demo) {
@@ -27,9 +29,10 @@ export function DemoBanner() {
     setSwitchingRole(targetRole)
     try {
       const { access_token } = await authService.switchDemoRole(targetRole)
+      queryClient.clear()
       setToken(access_token)
+      navigate(getRoleDashboard(targetRole), { replace: true })
       toast.success(`Switched role to ${targetRole.charAt(0).toUpperCase() + targetRole.slice(1)}`)
-      navigate(getRoleDashboard(targetRole))
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ?? 'Failed to switch demo role'
       toast.error(msg)

@@ -2,16 +2,24 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import type { Role } from '@/types'
 
+import { getRoleDashboard } from '@/utils'
+
 export function ProtectedRoute() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)()
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />
 }
 
 export function RoleRoute({ roles }: { roles: Role[] }) {
-  const user = useAuthStore((s) => s.user)
-  if (!user || !roles.includes(user.role)) {
+  const { user, isAuthenticated } = useAuthStore()
+
+  if (!isAuthenticated() || !user) {
     return <Navigate to="/login" replace />
   }
+
+  if (!roles.includes(user.role)) {
+    return <Navigate to={getRoleDashboard(user.role)} replace />
+  }
+
   return <Outlet />
 }
 
