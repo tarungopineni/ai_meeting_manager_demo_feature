@@ -22,6 +22,8 @@ origins = [
     "http://127.0.0.1:3000",
     "https://ai-meeting-manager-5yma.vercel.app",
     "https://ai-meeting-manager.vercel.app",
+    "https://ai-meeting-manager-demo-feature.vercel.app",
+    "*"
 ]
 
 env_origins = os.getenv("ALLOWED_ORIGINS")
