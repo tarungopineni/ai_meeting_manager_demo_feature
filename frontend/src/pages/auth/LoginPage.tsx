@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Lock, User } from 'lucide-react'
+import { Eye, EyeOff, Lock, User, Sparkles } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -21,6 +21,7 @@ type FormData = z.infer<typeof schema>
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [isDemoLoading, setIsDemoLoading] = useState(false)
   const { setToken } = useAuthStore()
   const navigate = useNavigate()
 
@@ -39,6 +40,24 @@ export default function LoginPage() {
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ?? 'Invalid credentials'
       toast.error(msg)
+    }
+  }
+
+  async function handleStartDemo() {
+    if (isDemoLoading || isSubmitting) return
+    setIsDemoLoading(true)
+    try {
+      const { access_token } = await authService.startDemo('manager')
+      setToken(access_token)
+      const user = useAuthStore.getState().user
+      toast.success('Isolated demo environment ready!')
+      navigate(getRoleDashboard(user?.role ?? 'manager'))
+    } catch (err: unknown) {
+      useAuthStore.getState().logout()
+      const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ?? 'Failed to initialize demo session. Please try again.'
+      toast.error(msg)
+    } finally {
+      setIsDemoLoading(false)
     }
   }
 
@@ -63,7 +82,7 @@ export default function LoginPage() {
             <span className="text-white font-bold text-lg">EM</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Welcome back</h1>
-          <p className="text-xs sm:text-sm text-text-muted mt-1">Sign in to your account to continue</p>
+          <p className="text-xs sm:text-sm text-text-muted mt-1">Sign in to your account or try instant demo</p>
         </div>
 
         {/* Card */}
@@ -120,16 +139,36 @@ export default function LoginPage() {
               <label htmlFor="remember" className="text-xs sm:text-sm text-text-secondary cursor-pointer">Remember me</label>
             </div>
 
-            <Button type="submit" loading={isSubmitting} className="w-full h-10 text-xs sm:text-sm font-medium">
+            <Button type="submit" loading={isSubmitting} disabled={isDemoLoading} className="w-full h-10 text-xs sm:text-sm font-medium">
               {isSubmitting ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>
+
+          {/* Divider */}
+          <div className="relative my-4 flex items-center justify-center">
+            <div className="w-full border-t border-surface-border" />
+            <span className="absolute bg-surface-card px-2 text-[10px] uppercase font-semibold text-text-muted">Or Recruiter Access</span>
+          </div>
+
+          {/* Try Demo Button */}
+          <button
+            type="button"
+            onClick={handleStartDemo}
+            disabled={isDemoLoading || isSubmitting}
+            className="w-full h-10 rounded-xl bg-accent/15 hover:bg-accent/25 text-accent font-semibold text-xs sm:text-sm
+                       border border-accent/30 transition-all flex items-center justify-center gap-2 cursor-pointer
+                       disabled:opacity-50 disabled:cursor-not-allowed glow-accent"
+          >
+            <Sparkles size={16} className={isDemoLoading ? 'animate-spin' : ''} />
+            {isDemoLoading ? 'Initializing Demo...' : 'Try Demo'}
+          </button>
         </div>
 
         <p className="text-center text-[11px] sm:text-xs text-text-muted mt-6">
-          Employee Management System • Secure Portal
+          Employee Management System • Multi-User Isolated Demo
         </p>
       </div>
     </div>
   )
 }
+

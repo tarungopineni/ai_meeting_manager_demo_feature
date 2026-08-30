@@ -5,6 +5,7 @@ import { CommandPalette } from '../shared/CommandPalette'
 import { TaskDetailDrawer } from '../shared/TaskDetailDrawer'
 import { Plasma } from '../ui/Plasma'
 import { useTaskDrawerStore } from '@/store/taskDrawerStore'
+import { useAuthStore } from '@/store/authStore'
 
 interface AppShellProps {
   children: React.ReactNode
@@ -15,6 +16,8 @@ interface AppShellProps {
 export function AppShell({ children, title, subtitle }: AppShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { task, close } = useTaskDrawerStore()
+  const user = useAuthStore((s) => s.user)
+  const isDemo = user?.is_demo
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -85,7 +88,7 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
             subtitle={subtitle}
             onOpenMobileMenu={() => setMobileMenuOpen(true)}
           />
-          <main className="pt-14 min-h-screen max-w-full overflow-x-hidden">
+          <main className={`${isDemo ? 'pt-[5.5rem]' : 'pt-14'} min-h-screen max-w-full overflow-x-hidden transition-all`}>
             <div className="p-3 sm:p-6 animate-fade-in max-w-full overflow-x-hidden">
               {children}
             </div>

@@ -1,5 +1,5 @@
 import api from './axios'
-import type { LoginResponse } from '@/types'
+import type { LoginResponse, Role } from '@/types'
 
 // Auth uses OAuth2 form, not JSON
 export const authService = {
@@ -18,6 +18,21 @@ export const authService = {
       }
     )
 
+    return res.data
+  },
+
+  startDemo: async (initialRole: Role = 'manager'): Promise<LoginResponse> => {
+    const res = await api.post<LoginResponse>(
+      `/auth/demo?initial_role=${initialRole}`
+    )
+    return res.data
+  },
+
+  switchDemoRole: async (role: Role): Promise<LoginResponse> => {
+    const res = await api.post<LoginResponse>(
+      '/auth/demo/switch-role',
+      { role }
+    )
     return res.data
   },
 }

@@ -4,7 +4,7 @@ from typing_extensions import Annotated
 import whisper
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from ..database import SessionLocal
+from ..database import SessionLocal, get_db
 from ..models import *
 from datetime import datetime
 from .auth import get_current_user
@@ -278,13 +278,6 @@ router = APIRouter(
     tags=["meetings"]
 )
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict,Depends(get_current_user)]
 UPLOAD_DIR = "uploads"
@@ -296,13 +289,23 @@ async def create_meeting(user:user_dependency,db: db_dependency,title: str=Form(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail = "user not authenticated")
     if user["role"] != "coordinator":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail = "user not authorized")
+    
+    is_demo = bool(user.get("is_demo"))
+    demo_session_id = user.get("demo_session_id") if is_demo else None
+
+    user_query = db.query(Users)
+    if is_demo:
+        user_query = user_query.filter(Users.is_demo == True, Users.demo_session_id == demo_session_id)
+    else:
+        user_query = user_query.filter(Users.is_demo == False)
+
     team_members = [
-    {
-        "id": u.id,
-        "name": u.name
-    }
-    for u in db.query(Users).all()
-]
+        {
+            "id": u.id,
+            "name": u.name
+        }
+        for u in user_query.all()
+    ]
     file_path = os.path.join(
         UPLOAD_DIR,
         audio_file.filename
@@ -326,13 +329,23 @@ async def create_meeting(user:user_dependency,db: db_dependency,title: str=Form(
             title=title,
             summary=data["summary"],
             audio_file_path=file_path,
-            transcript=transcript
+            transcript=transcript,
+            is_demo=is_demo,
+            demo_session_id=demo_session_id
         )
         db.add(meeting)
         for task in data["tasks"]:
-            manager = db.query(Users).filter(
-            Users.id == task["manager_id"]).first()
-            assignee = db.query(Users).filter(Users.id == task["assignee_id"]).first()
+            mgr_q = db.query(Users).filter(Users.id == task["manager_id"])
+            ass_q = db.query(Users).filter(Users.id == task["assignee_id"])
+            if is_demo:
+                mgr_q = mgr_q.filter(Users.is_demo == True, Users.demo_session_id == demo_session_id)
+                ass_q = ass_q.filter(Users.is_demo == True, Users.demo_session_id == demo_session_id)
+            else:
+                mgr_q = mgr_q.filter(Users.is_demo == False)
+                ass_q = ass_q.filter(Users.is_demo == False)
+
+            manager = mgr_q.first()
+            assignee = ass_q.first()
             if not manager or not assignee:
                 continue
             create_task_db(
@@ -348,7 +361,9 @@ async def create_meeting(user:user_dependency,db: db_dependency,title: str=Form(
                     verified_by_manager=task.get("verified_by_manager", False),
                     approved_by_manager=False
                 ),
-                db
+                db,
+                is_demo=is_demo,
+                demo_session_id=demo_session_id
             )
         db.commit()
         db.refresh(meeting)
@@ -368,4 +383,9 @@ async def get_all_meetings(user: user_dependency, db: db_dependency):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="user not authenticated")
     if user["role"] != "coordinator":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="user not authorized")
-    return db.query(Meetings).order_by(Meetings.created_at.desc()).all()
+    query = db.query(Meetings)
+    if user.get("is_demo"):
+        query = query.filter(Meetings.is_demo == True, Meetings.demo_session_id == user["demo_session_id"])
+    else:
+        query = query.filter(Meetings.is_demo == False)
+    return query.order_by(Meetings.created_at.desc()).all()

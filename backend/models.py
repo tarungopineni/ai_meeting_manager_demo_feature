@@ -15,6 +15,9 @@ class Users(Base):
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
     role = Column(String, nullable=False)
+    is_demo = Column(Boolean, default=False, nullable=False)
+    demo_session_id = Column(String, nullable=True, index=True)
+    demo_session_created_at = Column(DateTime, nullable=True)
 
 class Tasks(Base):
     __tablename__ = "tasks"
@@ -35,6 +38,8 @@ class Tasks(Base):
     )
     verified_by_manager = Column(Boolean, default=False, nullable=False)
     approved_by_manager = Column(Boolean, default=False, nullable=False)
+    is_demo = Column(Boolean, default=False, nullable=False)
+    demo_session_id = Column(String, nullable=True, index=True)
 
 class Meetings(Base):
     __tablename__ = "meetings"
@@ -44,3 +49,5 @@ class Meetings(Base):
     transcript = Column(String, nullable=True)
     summary = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    is_demo = Column(Boolean, default=False, nullable=False)
+    demo_session_id = Column(String, nullable=True, index=True)

@@ -5,6 +5,8 @@ export interface AuthUser {
   id: number
   username: string
   role: Role
+  is_demo?: boolean
+  demo_session_id?: string | null
 }
 
 export interface LoginResponse {

@@ -1,10 +1,11 @@
 from fastapi import APIRouter
-from ..database import SessionLocal
+from ..database import SessionLocal, get_db
 from passlib.context import CryptContext
 from typing import Annotated, Optional
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException
 from pydantic import BaseModel, ConfigDict
+from datetime import datetime
 from ..models import *
 from starlette import status
 from .auth import get_current_user
@@ -13,13 +14,6 @@ router = APIRouter(
     prefix="/users",
     tags=["users"]
 )
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
      
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 db_dependency = Annotated[Session, Depends(get_db)]
@@ -71,8 +65,17 @@ async def create_user(user: user_dependency,db: db_dependency,user_req: UserRequ
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="username already exists")
     if db.query(Users).filter(Users.email == user_req.email).first():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="email already exists")
+    
+    is_demo = user.get("is_demo", False)
+    demo_session_id = user.get("demo_session_id") if is_demo else None
+
     if user_req.manager_id is not None and user_req.manager_id != 0:
-        manager = db.query(Users).filter(Users.id == user_req.manager_id).first()
+        manager_query = db.query(Users).filter(Users.id == user_req.manager_id)
+        if is_demo:
+            manager_query = manager_query.filter(Users.is_demo == True, Users.demo_session_id == demo_session_id)
+        else:
+            manager_query = manager_query.filter(Users.is_demo == False)
+        manager = manager_query.first()
         if manager is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="manager not found")
         if manager.role != "manager":
@@ -91,7 +94,10 @@ async def create_user(user: user_dependency,db: db_dependency,user_req: UserRequ
         first_name=user_req.first_name,
         last_name=user_req.last_name,
         hashed_password=bcrypt_context.hash(user_req.password),
-        role=user_req.role
+        role=user_req.role,
+        is_demo=is_demo,
+        demo_session_id=demo_session_id,
+        demo_session_created_at=datetime.utcnow() if is_demo else None
     )
 
     db.add(new_user)
@@ -111,7 +117,7 @@ async def create_user_example(db: db_dependency,user_req: UserRequest):
     if db.query(Users).filter(Users.email == user_req.email).first():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="email already exists")
     if user_req.manager_id is not None and user_req.manager_id != 0:
-        manager = db.query(Users).filter(Users.id == user_req.manager_id).first()
+        manager = db.query(Users).filter(Users.id == user_req.manager_id, Users.is_demo == False).first()
         if manager is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="manager not found")
         if manager.role != "manager":
@@ -130,7 +136,9 @@ async def create_user_example(db: db_dependency,user_req: UserRequest):
         first_name=user_req.first_name,
         last_name=user_req.last_name,
         hashed_password=bcrypt_context.hash(user_req.password),
-        role=user_req.role
+        role=user_req.role,
+        is_demo=False,
+        demo_session_id=None
     )
 
     db.add(new_user)
@@ -145,7 +153,12 @@ async def get_all_users(db: db_dependency,user:user_dependency):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail = "user not authenticated")
     if user["role"] != "coordinator":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail = "user not authorized")
-    return db.query(Users).all()
+    query = db.query(Users)
+    if user.get("is_demo"):
+        query = query.filter(Users.is_demo == True, Users.demo_session_id == user["demo_session_id"])
+    else:
+        query = query.filter(Users.is_demo == False)
+    return query.all()
 
 @router.get("/get_user/{user_id}",status_code=status.HTTP_200_OK,response_model=UserResponse)
 async def get_user_by_id(db:db_dependency,user_id:int,user:user_dependency):
@@ -153,7 +166,12 @@ async def get_user_by_id(db:db_dependency,user_id:int,user:user_dependency):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail = "user not authenticated")
     if user["role"] != "coordinator":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail = "user not authorized")
-    model = db.query(Users).filter(Users.id == user_id).first()
+    query = db.query(Users).filter(Users.id == user_id)
+    if user.get("is_demo"):
+        query = query.filter(Users.is_demo == True, Users.demo_session_id == user["demo_session_id"])
+    else:
+        query = query.filter(Users.is_demo == False)
+    model = query.first()
     if model is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="user not found")
     return model
@@ -170,12 +188,22 @@ async def update_user(user:user_dependency,db:db_dependency,req:UpdateUserReques
             status_code=400,
             detail="invalid role"
         )
-    model = db.query(Users).filter(Users.id == user_id).first()
+    query = db.query(Users).filter(Users.id == user_id)
+    if user.get("is_demo"):
+        query = query.filter(Users.is_demo == True, Users.demo_session_id == user["demo_session_id"])
+    else:
+        query = query.filter(Users.is_demo == False)
+    model = query.first()
     if model is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="user not found")
     
     if req.manager_id is not None and req.manager_id != 0:
-        manager_model = db.query(Users).filter(Users.id == req.manager_id).first()
+        manager_query = db.query(Users).filter(Users.id == req.manager_id)
+        if user.get("is_demo"):
+            manager_query = manager_query.filter(Users.is_demo == True, Users.demo_session_id == user["demo_session_id"])
+        else:
+            manager_query = manager_query.filter(Users.is_demo == False)
+        manager_model = manager_query.first()
         if manager_model is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="manager not found")
         if manager_model.role != "manager":
@@ -207,12 +235,23 @@ async def update_user_manager(user:user_dependency,db:db_dependency,manager_id: 
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail = "user not authenticated")
     if user["role"] != "coordinator":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail = "user not authorized")
-    model = db.query(Users).filter(Users.id == user_id).first()
+    query = db.query(Users).filter(Users.id == user_id)
+    if user.get("is_demo"):
+        query = query.filter(Users.is_demo == True, Users.demo_session_id == user["demo_session_id"])
+    else:
+        query = query.filter(Users.is_demo == False)
+    model = query.first()
     if model is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="user not found")
     if model.id == manager_id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="user cannot be assigned to themselves")
-    manager_model = db.query(Users).filter(Users.id == manager_id).first()
+    
+    manager_query = db.query(Users).filter(Users.id == manager_id)
+    if user.get("is_demo"):
+        manager_query = manager_query.filter(Users.is_demo == True, Users.demo_session_id == user["demo_session_id"])
+    else:
+        manager_query = manager_query.filter(Users.is_demo == False)
+    manager_model = manager_query.first()
     if manager_model is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="manager not found")
     if manager_model.manager_id == model.id:
@@ -228,14 +267,29 @@ async def delete_user(user:user_dependency,db:db_dependency,user_id:int):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail = "user not authenticated")
     if user["role"] != "coordinator":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail = "user not authorized")
-    model = db.query(Users).filter(Users.id == user_id).first()
+    query = db.query(Users).filter(Users.id == user_id)
+    if user.get("is_demo"):
+        query = query.filter(Users.is_demo == True, Users.demo_session_id == user["demo_session_id"])
+    else:
+        query = query.filter(Users.is_demo == False)
+    model = query.first()
     if model is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="employee not found")
     if model.role == "manager":
-        staff = db.query(Users).filter(Users.manager_id == user_id).first()
+        staff_query = db.query(Users).filter(Users.manager_id == user_id)
+        if user.get("is_demo"):
+            staff_query = staff_query.filter(Users.is_demo == True, Users.demo_session_id == user["demo_session_id"])
+        else:
+            staff_query = staff_query.filter(Users.is_demo == False)
+        staff = staff_query.first()
         if staff:
             raise HTTPException(status_code=400,detail="manager has assigned employees")
-    db.query(Tasks).filter((Tasks.assignee_id == user_id) | (Tasks.manager_id == user_id)).delete(synchronize_session=False)
+    task_delete_query = db.query(Tasks).filter((Tasks.assignee_id == user_id) | (Tasks.manager_id == user_id))
+    if user.get("is_demo"):
+        task_delete_query = task_delete_query.filter(Tasks.is_demo == True, Tasks.demo_session_id == user["demo_session_id"])
+    else:
+        task_delete_query = task_delete_query.filter(Tasks.is_demo == False)
+    task_delete_query.delete(synchronize_session=False)
     db.delete(model)
     db.commit()
 
@@ -245,14 +299,23 @@ async def get_team(user:user_dependency,db:db_dependency):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail = "user not authenticated")
     if user["role"] != "manager":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail = "user not authorized")
-    model = db.query(Users).filter(Users.manager_id == user["id"]).all()
-    return model
+    query = db.query(Users).filter(Users.manager_id == user["id"])
+    if user.get("is_demo"):
+        query = query.filter(Users.is_demo == True, Users.demo_session_id == user["demo_session_id"])
+    else:
+        query = query.filter(Users.is_demo == False)
+    return query.all()
 
 @router.put("/update_credentials/{user_id}",status_code=status.HTTP_204_NO_CONTENT)
 async def update_credentials(user: user_dependency,db: db_dependency,user_id: int,req: UpdateCredentialsRequest):
     if user["role"] != "coordinator":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="user not authorized")
-    model = db.query(Users).filter(Users.id == user_id).first()
+    query = db.query(Users).filter(Users.id == user_id)
+    if user.get("is_demo"):
+        query = query.filter(Users.is_demo == True, Users.demo_session_id == user["demo_session_id"])
+    else:
+        query = query.filter(Users.is_demo == False)
+    model = query.first()
     if model is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="user not found")
     existing_username = db.query(Users).filter(Users.username == req.username,Users.id != user_id).first()

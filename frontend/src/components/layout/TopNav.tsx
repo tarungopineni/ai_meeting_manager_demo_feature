@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useTaskDrawerStore } from '@/store/taskDrawerStore'
 import { tasksService } from '@/api/tasks.service'
 import { meetingsService } from '@/api/meetings.service'
+import { DemoBanner } from './DemoBanner'
 
 
 interface TopNavProps {
@@ -184,8 +185,10 @@ export function TopNav({ title, subtitle, onOpenMobileMenu }: TopNavProps) {
   }
 
   return (
-    <header className="fixed top-0 left-0 lg:left-60 right-0 h-14 flex items-center justify-between
-                       px-3 sm:px-6 bg-surface-base/80 backdrop-blur-md border-b border-surface-border z-20">
+    <div className="fixed top-0 left-0 lg:left-60 right-0 z-20">
+      <DemoBanner />
+      <header className="h-14 flex items-center justify-between
+                         px-3 sm:px-6 bg-surface-base/80 backdrop-blur-md border-b border-surface-border">
       <div className="flex items-center gap-2 min-w-0">
         <button
           onClick={onOpenMobileMenu}
@@ -278,5 +281,6 @@ export function TopNav({ title, subtitle, onOpenMobileMenu }: TopNavProps) {
         </div>
       </div>
     </header>
+    </div>
   )
 }

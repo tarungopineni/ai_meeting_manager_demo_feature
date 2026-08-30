@@ -7,6 +7,8 @@ interface JwtPayload {
   sub: string
   id: number
   role: Role
+  is_demo?: boolean
+  demo_session_id?: string | null
   exp: number
 }
 
@@ -29,7 +31,13 @@ export const useAuthStore = create<AuthState>()(
           const decoded = jwtDecode<JwtPayload>(token)
           set({
             token,
-            user: { id: decoded.id, username: decoded.sub, role: decoded.role },
+            user: {
+              id: decoded.id,
+              username: decoded.sub,
+              role: decoded.role,
+              is_demo: decoded.is_demo ?? false,
+              demo_session_id: decoded.demo_session_id ?? null,
+            },
           })
         } catch {
           set({ token: null, user: null })
