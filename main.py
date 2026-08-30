@@ -5,6 +5,10 @@ import whisper
 from dotenv import load_dotenv
 from openai import OpenAI
 
+try:
+    from backend.main import app
+except Exception as e:
+    print(f"Warning: could not import app from backend.main: {e}")
 
 load_dotenv()
 
