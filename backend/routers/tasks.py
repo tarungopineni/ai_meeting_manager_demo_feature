@@ -162,7 +162,7 @@ async def get_overdue_tasks(user: user_dependency, db: db_dependency):
     query = db.query(Tasks).filter(
         Tasks.assignee_id == user["id"],
         Tasks.deadline != None,
-        Tasks.deadline < datetime.datetime.now(),
+        Tasks.deadline < datetime.now(),
         Tasks.completed == False
     )
     if user.get("is_demo"):
@@ -356,7 +356,7 @@ async def mark_task_completed(user:user_dependency,task_id:int,db:db_dependency)
             task_id=model.id,
             task_title=model.title,
             task_description=model.description,
-            completed_at=datetime.datetime.now().isoformat()
+            completed_at=datetime.now().isoformat()
         )
         try:
             send_email(
@@ -373,7 +373,7 @@ async def mark_task_completed(user:user_dependency,task_id:int,db:db_dependency)
 async def get_task_warnings(user: user_dependency,db: db_dependency):
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="User not authenticated")
-    now = datetime.datetime.now()
+    now = datetime.now()
     warning_deadline = now + timedelta(days=1)
     query = db.query(Tasks).filter(Tasks.assignee_id == user["id"],Tasks.completed == False,Tasks.deadline != None,Tasks.deadline <= warning_deadline)
     if user.get("is_demo"):
@@ -398,7 +398,7 @@ async def get_task_warnings(user: user_dependency,db: db_dependency):
                 "deadline_text": task.deadline_text,
                 "is_overdue": time_remaining.total_seconds() < 0
             })
-
+    print(warnings,'--------')
     return warnings
 
 @router.get("/manager/task-warnings", status_code=status.HTTP_200_OK)
@@ -410,7 +410,7 @@ async def get_manager_task_warnings(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="User not authenticated")
     if user["role"] != "manager":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="User not authorized to view task warnings")
-    now = datetime.datetime.now()
+    now = datetime.now()
     warning_deadline = now + timedelta(days=1)
 
     query = db.query(Tasks).filter(Tasks.manager_id == user["id"],Tasks.completed == False,Tasks.deadline != None,Tasks.deadline <= warning_deadline)
@@ -453,7 +453,7 @@ async def send_warning_emails(user: user_dependency,db: db_dependency):
     if user.get("is_demo"):
         return {"message": "0 warning emails sent (demo mode active)"}
 
-    now = datetime.datetime.now()
+    now = datetime.now()
     warning_deadline = now + timedelta(days=1)
     
     query = db.query(Tasks).filter(
@@ -501,4 +501,4 @@ async def send_warning_emails(user: user_dependency,db: db_dependency):
             
     return {
         "message": f"{emails_sent} warning emails sent"
-    }
+    }
